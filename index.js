@@ -12,7 +12,9 @@ app.use(express.json()); // Parse JSON bodies
 app.use(cors());
 
 const submissions = []; // In-memory storage
-
+app.get('/api/rsvps', (req, res) => {
+  res.json(submissions);
+});
 app.post('/api/rsvp', (req, res) => {
   console.log('Request body:', req.body);
   const { name, email, attending } = req.body;
