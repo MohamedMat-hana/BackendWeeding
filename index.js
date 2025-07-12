@@ -1,30 +1,32 @@
-const express = require("express");
-const cors = require("cors");
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
+const express = require('express');
+const cors = require('cors');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-app.use(cors());
+// Middleware
+app.use(express.json()); // Parse JSON bodies (fixes req.body error)
+app.use(cors({
+  origin: 'https://wedding-invitation.vercel.app' // Update with your Vercel URL
+}));
 
 const submissions = []; // In-memory storage (use database for production)
- 
-app.post("/api/rsvp", (req, res) => {
-  console.log("Request body:", req.body); // Debug log to inspect incoming data
+
+app.post('/api/rsvp', (req, res) => {
+  console.log('Request body:', req.body);
   const { name, email, attending } = req.body;
   if (!name || !email || !attending) {
-    return res.status(400).json({ message: "All fields are required" });
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
   submissions.push({ name, email, attending });
-  console.log("Submission:", { name, email, attending });
-  res.json({ message: "RSVP submitted successfully!" });
+  console.log('Submission:', { name, email, attending });
+  res.json({ message: 'RSVP submitted successfully!' });
 
-  // Optional: Send email notification
+  // Optional: Email notification
   /*
   const transporter = nodemailer.createTransport({
     service: 'gmail',
