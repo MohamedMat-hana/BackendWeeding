@@ -9,9 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json()); // Parse JSON bodies
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'https://wedding-invitation.vercel.app' : 'http://localhost:5173' // Dynamic origin
-}));
+app.use(cors());
 
 const submissions = []; // In-memory storage
 
