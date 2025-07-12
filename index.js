@@ -10,9 +10,8 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(express.json()); // Parse JSON bodies (fixes req.body error)
 app.use(cors({
-  origin: 'https://wedding-invitation.vercel.app' // Update with your Vercel URL
+  origin: 'https://wedding-invitation-server-bmfg.onrender.com'
 }));
-
 const submissions = []; // In-memory storage (use database for production)
 
 app.post('/api/rsvp', (req, res) => {
