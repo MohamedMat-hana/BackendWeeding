@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -22,6 +23,15 @@ mongoose.connect(process.env.MONGODB_URI, {
 })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // RSVP Schema
 const rsvpSchema = new mongoose.Schema({
@@ -54,9 +64,17 @@ app.post('/api/rsvp', async (req, res) => {
     const rsvp = new RSVP({ name, email, attending });
     await rsvp.save();
     console.log('Submission saved:', { name, email, attending });
+
+    await transporter.sendMail({
+      from: `"Mohamed & Rawan Wedding" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: `New RSVP from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\nAttending: ${attending}`,
+    });
+
     res.json({ message: 'RSVP submitted successfully!' });
   } catch (error) {
-    console.error('Error saving RSVP:', error);
+    console.error('Error saving RSVP or sending email:', error);
     res.status(500).json({ message: 'Error submitting RSVP' });
   }
 });
