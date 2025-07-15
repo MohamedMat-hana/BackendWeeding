@@ -10,8 +10,8 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: ['https://wedding-app-345l.vercel.app', 'http://localhost:3000'],
-  methods: ['GET', 'POST'],
+  origin: ['https://wedding-app-345l.vercel.app', 'http://localhost:3000', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   credentials: true,
 }));
 
@@ -35,7 +35,7 @@ const RSVP = mongoose.model('RSVP', rsvpSchema);
 // Routes
 app.get('/api/rsvps', async (req, res) => {
   try {
-    const submissions = await RSVP.find().sort({ createdAt: -1 }); // Sort by newest first
+    const submissions = await RSVP.find().sort({ createdAt: -1 });
     res.json(submissions);
   } catch (error) {
     console.error('Error fetching RSVPs:', error);
