@@ -33,10 +33,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// RSVP Schema
+// RSVP Schema - Email field removed
 const rsvpSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true },
   attending: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
@@ -55,24 +54,49 @@ app.get('/api/rsvps', async (req, res) => {
 
 app.post('/api/rsvp', async (req, res) => {
   console.log('Request body:', req.body);
-  const { name, email, attending } = req.body;
-  if (!name || !email || !attending) {
-    return res.status(400).json({ message: 'All fields are required' });
+  // Destructure name and attending only, email is no longer expected
+  const { name, attending } = req.body; 
+  
+  // Validate only name and attending
+  if (!name || !attending) {
+    return res.status(400).json({ message: 'Name and attendance status are required' });
   }
 
-  try {
-    const rsvp = new RSVP({ name, email, attending });
+   try {
+    // Create new RSVP with userMessage
+    const rsvp = new RSVP({ name, userMessage }); 
     await rsvp.save();
-    console.log('Submission saved:', { name, email, attending });
+    console.log('Submission saved:', { name, userMessage });
 
+    // HTML content for the email
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #f8f8f8; padding: 20px; text-align: center; border-bottom: 1px solid #ddd;">
+          <h2 style="color: #9b2c2c; margin: 0;">New Message for Mohamed & Rawan!</h2>
+        </div>
+        <div style="padding: 20px;">
+          <p>You've received a new message from your wedding website:</p>
+          <p style="background-color: #f0f0f0; padding: 15px; border-left: 5px solid #9b2c2c; margin-bottom: 20px;">
+            <strong>Name:</strong> ${name}<br>
+            <strong>Message:</strong> ${attending}
+          </p>
+          <p>This message was sent on ${new Date().toLocaleString()}.</p>
+        </div>
+        <div style="background-color: #f8f8f8; padding: 15px; text-align: center; font-size: 0.8em; color: #777; border-top: 1px solid #ddd;">
+          <p>&copy; Mohamed & Rawan Wedding. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    // Send email with HTML content
     await transporter.sendMail({
       from: `"Mohamed & Rawan Wedding" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      subject: `New RSVP from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nAttending: ${attending}`,
+      subject: `New Message from ${name}`, // Subject remains the same
+      html: emailHtml, // Use 'html' instead of 'text'
     });
 
-    res.json({ message: 'RSVP submitted successfully!' });
+    res.json({ message: 'Message submitted successfully!' });
   } catch (error) {
     console.error('Error saving RSVP or sending email:', error);
     res.status(500).json({ message: 'Error submitting RSVP' });
