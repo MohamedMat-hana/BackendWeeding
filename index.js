@@ -63,10 +63,10 @@ app.post('/api/rsvp', async (req, res) => {
   }
 
    try {
-    // Create new RSVP with userMessage
-    const rsvp = new RSVP({ name, userMessage }); 
+    // Create new RSVP with attending
+    const rsvp = new RSVP({ name, attending }); 
     await rsvp.save();
-    console.log('Submission saved:', { name, userMessage });
+    console.log('Submission saved:', { name, attending });
 
     // HTML content for the email
     const emailHtml = `
