@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// RSVP Schema - Email field removed
+// RSVP Schema
 const rsvpSchema = new mongoose.Schema({
   name: { type: String, required: true },
   attending: { type: String, required: true },
@@ -44,7 +44,9 @@ const RSVP = mongoose.model('RSVP', rsvpSchema);
 // Routes
 app.get('/api/rsvps', async (req, res) => {
   try {
+    console.log('Fetching RSVPs from MongoDB');
     const submissions = await RSVP.find().sort({ createdAt: -1 });
+    console.log('RSVPs fetched:', submissions);
     res.json(submissions);
   } catch (error) {
     console.error('Error fetching RSVPs:', error);
@@ -54,46 +56,55 @@ app.get('/api/rsvps', async (req, res) => {
 
 app.post('/api/rsvp', async (req, res) => {
   console.log('Request body:', req.body);
-  // Destructure name and attending only, email is no longer expected
-  const { name, attending } = req.body; 
-  
-  // Validate only name and attending
+  const { name, attending } = req.body;
+
   if (!name || !attending) {
     return res.status(400).json({ message: 'Name and attendance status are required' });
   }
 
-   try {
-    // Create new RSVP with attending
-    const rsvp = new RSVP({ name, attending }); 
+  try {
+    const rsvp = new RSVP({ name, attending });
     await rsvp.save();
     console.log('Submission saved:', { name, attending });
 
-    // HTML content for the email
+    // Enhanced HTML content for the email with Egypt time
     const emailHtml = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-        <div style="background-color: #f8f8f8; padding: 20px; text-align: center; border-bottom: 1px solid #ddd;">
-          <h2 style="color: #9b2c2c; margin: 0;">New Message for Mohamed & Rawan!</h2>
+      <div style="font-family: 'Georgia', serif; line-height: 1.6; color: #4A3C31; max-width: 600px; margin: 0 auto; background-color: #FFF5F5; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, #F8B7B7 0%, #FFD1DC 100%); padding: 30px; text-align: center;">
+          <h1 style="color: #4A3C31; margin: 0; font-size: 28px; font-weight: bold;">Mohamed & Rawan's Wedding</h1>
+          <p style="color: #6B4E31; font-size: 16px; margin: 10px 0 0;">A New RSVP Awaits!</p>
         </div>
-        <div style="padding: 20px;">
-          <p>You've received a new message from your wedding website:</p>
-          <p style="background-color: #f0f0f0; padding: 15px; border-left: 5px solid #9b2c2c; margin-bottom: 20px;">
-            <strong>Name:</strong> ${name}<br>
-            <strong>Message:</strong> ${attending}
-          </p>
-          <p>This message was sent on ${new Date().toLocaleString()}.</p>
+        <div style="padding: 20px; background-color: #FFFFFF;">
+          <p style="font-size: 16px; color: #4A3C31;">Dear Mohamed & Rawan,</p>
+          <p style="font-size: 16px; color: #4A3C31;">You've received a new RSVP from your wedding website:</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #FFF5F5; border-radius: 8px;">
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31; border-bottom: 1px solid #F8B7B7;">Name:</td>
+              <td style="padding: 12px; color: #4A3C31;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31; border-bottom: 1px solid #F8B7B7;">Attendance:</td>
+              <td style="padding: 12px; color: #4A3C31;">${attending}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31;">Date & Time:</td>
+              <td style="padding: 12px; color: #4A3C31;">${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo' })}</td>
+            </tr>
+          </table>
+          <p style="font-size: 16px; color: #4A3C31; text-align: center;">Thank you for celebrating with us!</p>
         </div>
-        <div style="background-color: #f8f8f8; padding: 15px; text-align: center; font-size: 0.8em; color: #777; border-top: 1px solid #ddd;">
-          <p>&copy; Mohamed & Rawan Wedding. All rights reserved.</p>
+        <div style="background-color: #F8B7B7; padding: 15px; text-align: center; font-size: 12px; color: #4A3C31;">
+          <p style="margin: 0;">© 2025 Mohamed & Rawan Wedding. All rights reserved.</p>
+          <p style="margin: 5px 0 0;">Crafted with love for your special day.</p>
         </div>
       </div>
     `;
 
-    // Send email with HTML content
     await transporter.sendMail({
       from: `"Mohamed & Rawan Wedding" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      subject: `New Message from ${name}`, // Subject remains the same
-      html: emailHtml, // Use 'html' instead of 'text'
+      subject: `New RSVP from ${name}`,
+      html: emailHtml,
     });
 
     res.json({ message: 'Message submitted successfully!' });
