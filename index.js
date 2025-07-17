@@ -78,7 +78,37 @@ app.post('/api/rsvp', async (req, res) => {
     console.log('Submission saved:', { name, attending });
 
     // Email sending logic (unchanged)
-    const emailHtml = `...`; // Your HTML content here
+    const emailHtml = `
+      <div style="font-family: 'Georgia', serif; line-height: 1.6; color: #4A3C31; max-width: 600px; margin: 0 auto; background-color: #FFF5F5; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, #F8B7B7 0%, #FFD1DC 100%); padding: 30px; text-align: center;">
+          <h1 style="color: #F8B7B7; margin: 0; font-size: 28px; font-weight: bold;">Mohamed & Rawan's Wedding</h1>
+          <p style="color: #F8B7B7; font-size: 16px; margin: 10px 0 0;">A New RSVP Awaits!</p>
+        </div>
+        <div style="padding: 20px; background-color: #FFFFFF;">
+          <p style="font-size: 16px; color: #4A3C31;">Dear Mohamed & Rawan,</p>
+          <p style="font-size: 16px; color: #4A3C31;">You've received a new RSVP from your wedding website:</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #FFF5F5; border-radius: 8px;">
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31; border-bottom: 1px solid #F8B7B7;">Name:</td>
+              <td style="padding: 12px; color: #4A3C31;">${name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31; border-bottom: 1px solid #F8B7B7;">Attendance:</td>
+              <td style="padding: 12px; color: #4A3C31;">${attending}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #4A3C31;">Date & Time:</td>
+              <td style="padding: 12px; color: #4A3C31;">${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo' })}</td>
+            </tr>
+          </table>
+          <p style="font-size: 16px; color: #4A3C31; text-align: center;">Thank you for celebrating with us!</p>
+        </div>
+        <div style="background-color: #F8B7B7; padding: 15px; text-align: center; font-size: 12px; color: #4A3C31;">
+          <p style="margin: 0;">© 2025 Mohamed & Rawan Wedding. All rights reserved.</p>
+          <p style="margin: 5px 0 0;">Crafted with love for your special day.</p>
+        </div>
+      </div>
+    `;
 
     await transporter.sendMail({
       from: `"Mohamed & Rawan Wedding" <${process.env.EMAIL_USER}>`,
