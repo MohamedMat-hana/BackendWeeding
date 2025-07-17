@@ -71,8 +71,8 @@ app.post('/api/rsvp', async (req, res) => {
     const emailHtml = `
       <div style="font-family: 'Georgia', serif; line-height: 1.6; color: #4A3C31; max-width: 600px; margin: 0 auto; background-color: #FFF5F5; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         <div style="background: linear-gradient(135deg, #F8B7B7 0%, #FFD1DC 100%); padding: 30px; text-align: center;">
-          <h1 style="color: #4A3C31; margin: 0; font-size: 28px; font-weight: bold;">Mohamed & Rawan's Wedding</h1>
-          <p style="color: #6B4E31; font-size: 16px; margin: 10px 0 0;">A New RSVP Awaits!</p>
+          <h1 style="color: #F8B7B7; margin: 0; font-size: 28px; font-weight: bold;">Mohamed & Rawan's Wedding</h1>
+          <p style="color: #F8B7B7; font-size: 16px; margin: 10px 0 0;">A New RSVP Awaits!</p>
         </div>
         <div style="padding: 20px; background-color: #FFFFFF;">
           <p style="font-size: 16px; color: #4A3C31;">Dear Mohamed & Rawan,</p>
